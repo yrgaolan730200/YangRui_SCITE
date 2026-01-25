@@ -5,6 +5,43 @@
  *      Author: jahnka
  */
 
+ /*mcmcTreeMove.cpp
+
+ 1. 简介：
+    实现突变树在 MCMC 采样过程中的各种拓扑结构变动（Moves）策略，包括剪枝重接、节点交换及子树交换。
+
+ 2.背景说明：
+    该文件是 SCITE 等生物信息学推断工具的核心组件。它定义了如何在突变进化树（Mutation Tree）的空间内进行随机搜索。
+    这些变动算子保证了 MCMC 链在树空间的遍历性，是计算最大后验概率树或进行贝叶斯推断的关键步骤。
+
+ 3.主要内容：
+    proposeNewTree()：根据给定的概率分布随机选择并执行一种变动算子（剪枝、交换标签或交换子树）来生成新候选树
+    choseParent()：从候选父节点集中（包括根节点）随机选取一个节点作为目标挂载点
+    getNewParentVecFast()：通过修改特定节点的父节点快速生成新的父节点向量
+    getNewParentVec_SwapFast()：通过交换两个节点的标签及相应的父子关系快速生成新向量
+    reorderToStartWithDescendant()：调整两个节点的顺序，确保在同一谱系时先处理后代节点，以维持树的结构合法性
+    getNewAncMatrix_Swap()：通过行列交换更新节点的祖先矩阵
+    getNewAncMatrix()：在剪枝重接操作后，根据新的拓扑关系增量更新祖先矩阵
+    
+ 4.输入：
+    moveProbs：各种变动类型（Prune & Re-attach, Swap Labels, Swap Subtrees）的选择概率向量
+    n：树中节点的数量（通常代表突变位点数）
+    currTreeAncMatrix：当前树的祖先矩阵（$n \times n$）
+    currTreeParentVec：当前树的父节点向量表示nbhcorrection：引用参数，用于存储并返回变动导致的邻域修正因子（Neighborhood Correction）
+
+ 5.输出：
+    propTreeParVec：生成并返回新候选树的父节点向量指针（若变动失败则返回 NULL）
+    
+ 6.注意事项：
+    算法假设：
+        假设生成的结构始终为有根树（Rooted Tree），根节点通常表示为 $n$ 或 $n+1$。
+
+    使用时的重要限制或潜在问题：
+        在交换位于同一谱系（Lineage）的子树时，必须引入邻域修正因子以修正转移概率的不对称性，
+        否则会破坏 MCMC 的细致平衡条件（Detailed Balance）。代码中通过 nbhcorrection 实现此项修正。
+*/
+ 
+
 #include <stdbool.h>
 #include <vector>
 #include <stdlib.h>

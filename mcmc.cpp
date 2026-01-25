@@ -5,6 +5,47 @@
  *      Author: jahnka
  */
 
+/*	mcmc.cpp
+
+1. 简介： 
+	实现基于 MCMC（马尔可夫链蒙特卡罗）算法的核心迭代过程，用于联合推断肿瘤突变树结构和测序错误率。
+
+2. 背景说明： 
+	该文件是 SCITE 项目的算法核心实现，负责执行马尔可夫链的采样与搜索。它通过在树空间和错误率参数空间中进行随机游走，
+	找最大后验概率（MAP）或最大似然（ML）解。对应论文中关于肿瘤演化树推断的随机搜索算法步骤。
+
+3. 主要内容： 
+	runMCMCbeta()：执行 MCMC 迭代循环，协调树结构提案（Tree Moves）和错误率提案（Beta Moves） 
+	logBetaPDF()：计算 Beta 分布的对数概率密度函数，用于错误率的先验评估 
+	proposeNewBeta()：通过正态分布随机游走为错误率参数提出新的候选值 
+	sampleNormal()：使用 Box-Muller 变换生成服从正态分布的随机数 
+	sampleFromPosterior()：将当前迭代步的树结构、错误率及得分格式化为字符串用于后验采样输出 
+	updateMinDistToTrueTree()：在已知真值树的情况下，更新并记录当前搜寻到的最优树与真值之间的最小距离 
+	getSimpleDistance()：计算两个树向量之间的简单距离（即父节点不同的节点数量）
+
+4. 输入： 
+	bestTrees：用于存储搜索过程中发现的最优树/错误率组合的向量 
+	errorRates：初始错误率参数数组（包含假阳性、假阴性等） 
+	noOfReps：MCMC 重复次数（从不同起点开始独立运行） 
+	noOfLoops：每轮 MCMC 的总迭代次数 
+	gamma：退火/缩放因子，用于调整得分函数以控制收敛速度 
+	moveProbs：各种 MCMC 提案（Moves）的操作概率分布 
+	n：突变数量 
+	m：细胞数量 
+	dataMatrix：输入的单细胞突变观测矩阵 
+	scoreType：评分类型标识 
+	treeType：树模型类型（'m' 为突变树，'t' 为转置后的二叉样本树）
+
+5. 输出： 
+	sampleOutput：包含后验分布采样的字符串流（树结构、得分及错误率）
+
+6. 注意事项： 
+	算法假设：
+		默认假设存在一个潜在的进化树，且测序噪声遵循特定的错误模型；错误率的先验分布服从 Beta 分布。 
+	使用时的重要限制或潜在问题：
+		前 25% 的迭代被视为 Burn-in 阶段，其采样结果不计入最终后验统计；Beta 提案的跳跃步长受 chi 参数限制，若设置不当可能导致接受率过低或收敛缓慢。
+*/
+
 #include <stdbool.h>
 #include <vector>
 #include <stdlib.h>

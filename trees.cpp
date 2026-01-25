@@ -4,6 +4,45 @@
  *  Created on: Oct 12, 2015
  *      Author: jahnka
  */
+/*	trees.cpp
+1. 简介：
+	实现树结构的各种表示形式（父节点向量、祖先矩阵、Prüfer 序列、子节点列表）之间的转换及树的拓扑操作。
+
+2.背景说明：
+	该文件是 SCITE 算法中处理进化树拓扑的核心工具库。它负责在 MCMC 采样过程中生成初始随机树、维护树的层次关系，
+	并为似然得分计算和最终的 Newick 格式导出提供底层算法支持，主要对应论文中关于搜索空间拓扑表示和变换的部分。
+
+3. 主要内容：
+	getDescendants()：通过祖先矩阵获取指定节点的所有后代节点集合。
+	getNonDescendants()：获取所有不是指定节点后代的节点。
+	countBranches()：通过统计子节点列表中的叶子节点数量来计算树的支路数。
+	getChildListFromParentVector()：将父节点向量转换为邻接表格式的子节点列表。
+	getNewickCode()：递归生成符合 Newick 标准的树描述字符串，用于系统发育分析。
+	getBreadthFirstTraversal()：计算树的广度优先遍历序列（BFT），常用于优化评分时的顺序访问。
+	parentVector2ancMatrix()：将父节点向量转换为完整的祖先关系矩阵（包含自环）。
+	prueferCode2parentVector()：使用线性时间的 Prüfer 序列算法重构对应的唯一树父节点向量。
+	getRandParentVec()：生成一个包含 n 个突变位点且以第 n 号节点为根的随机树父节点向量。
+	starTreeVec() / starTreeMatrix()：生成星形树（Star Tree）的向量或矩阵表示，通常用于搜索的初始状态。
+
+4.	输入：
+	parent：存储节点父代索引的整型数组。
+	ancMatrix：表示节点间祖先关系的布尔型矩阵。
+	code/codeLength：Prüfer 编码序列及其长度。
+	n：突变位点或节点的数量。
+	root：作为递归起点或树根的节点索引。
+
+5.	输出：
+	childList：嵌套的 vector 结构，表示每个节点的子节点集合。
+	ancMatrix：转换后的 $n \times n$ 祖先矩阵。
+	parentVector：重构或生成的树父节点向量指针。
+	Newick string：树的 Newick 格式字符串。
+
+6. 注意事项：
+	算法假设：
+		假定树是连通且无环的；在 prueferCode2parentVector 中，假定根节点索引始终为 codeLength + 1。
+	使用时的重要限制或潜在问题：
+		返回的数组（如 bft, parent）通常是在堆上分配的，调用者需负责内存释放；getNewickCode 必须从真实的根节点开始递归，否则生成的字符串不完整。
+*/
 
 #include <stdbool.h>
 #include <vector>

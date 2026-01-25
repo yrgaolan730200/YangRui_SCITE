@@ -5,6 +5,55 @@
  *      Author: jahnka
  */
 
+ /*	output.cpp
+
+1. 简介： 
+	处理 MCMC 搜索结果的后期处理与可视化输出，包括寻找突变的最优放置位置及生成 GraphViz 格式的树结构文件。
+
+2. 背景说明： 
+	该文件位于 SCITE 算法管线的末端，负责将抽象的 MCMC 采样结果（如父节点向量、祖先矩阵）转换为可解释的生物学结论。
+	它实现了将单细胞样本挂载到进化树上的逻辑，并支持将结果导出为 .gv 文件以便进行图形化展示。
+
+3.主要内容：
+	binTreeRootScore()：计算特定突变放置在树根节点时的对数得分贡献 
+	getHighestOptPlacement()：在给定样本树拓扑下，计算并返回单个突变的最优位置索引 
+	getHighestOptPlacementVector()：遍历所有突变，计算每个突变在树中的最佳放置位置向量 
+	getBinTreeNodeLabels()：为二叉树节点分配基因名称标签，合并同一位置的多个突变 
+	getLcaWithLabel()：向上寻找最近的具有非空标签的祖先节点，用于简化图形展示 
+	getGraphVizBinTree()：生成二叉样本树（Sample Tree）的 GraphViz 格式内容 
+	getMutTreeGraphViz()：生成突变树（Mutation Tree）的 GraphViz 格式内容 
+	writeToFile()：将生成的字符串内容写入磁盘文件 
+	getGraphVizFileContentNumbers()：使用数字索引生成基础的 GraphViz 树结构 
+	getGraphVizFileContentNames()：使用基因名称生成带样本挂载信息的 GraphViz 树结构 
+	getBestAttachmentString()：计算样本到基因树的最佳附件关系并转换为字符串 
+	attachmentPoints()：重新计算每个样本在当前树中的最佳挂载点矩阵 
+	printParentVectors()：将最优树列表以父节点向量和 GraphViz 格式打印至控制台 
+	printGraphVizFile()：将单一树结构的 GraphViz 文件内容打印至控制台 
+	printSampleTrees()：将采样得到的树列表批量写入指定的文本文件 
+	printScoreKimSimonTree()：评估并打印 Kim & Simon 方法预测树的对数似然得分
+
+4.输入：
+	obsMutProfiles/dataMatrix：观测到的单细胞突变谱矩阵 
+	logScores：预计算的错误对数似然得分矩阵（依赖于假阳性/假阴性率）
+	ancMatrix：表示树拓扑结构的祖先关系矩阵
+	parents/currTreeParentVec：节点的父节点向量表示 
+	geneNames：基因/突变位点的名称列表
+
+5.输出：
+	GraphViz string：符合 DOT 语言标准的树描述字符串 
+	bestPlacements：包含各突变最优位置索引的整型数组 
+	attachmentMatrix：指示样本与基因节点挂载关系的布尔矩阵
+
+6.注意事项：
+	算法假设：
+		挂载逻辑假设样本应该被放置在最大化其突变观测似然的节点上；在 getHighestOptPlacement 中，若存在多个得分相同的最高位置，
+		默认选择更靠近根部的节点（Highest Placement）。
+	
+	使用时的重要限制或潜在问题：
+		GraphViz 输出主要用于中小型规模的树（如突变数 < 100），在超大规模数据下生成的图片可能难以阅读；
+		某些辅助函数（如 printScoreKimSimonTree）包含硬编码的固定树结构，仅供特定的基准测试使用。
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <iostream>

@@ -5,6 +5,45 @@
  *      Author: jahnka
  */
 
+/*	findBestTrees_noR.cpp
+
+1. 简介： 
+	SCITE 软件的主程序文件，用于通过 MCMC 算法推断单细胞测序数据中的肿瘤突变进化树。 
+
+2. 背景说明： 
+	该文件是 SCITE 项目的入口点，负责解析命令行参数、加载突变矩阵、配置错误率模型及启动 MCMC 搜索流程，最终输出最大似然或最大后验概率树。对应于 Kuipers J 等人 2017 年发表在 Genome Research 上的研究。 
+
+3. 主要内容：
+	main()：程序主入口，协调数据读取、MCMC 运行及结果输出。 
+	readParameters()：解析命令行输入的各项算法参数（如采样步长、错误率、重复次数等）。
+	getDataMatrix()：从指定 CSV 文件中读取并构建单细胞突变矩阵。 
+	runMCMCbeta()：执行核心 MCMC 算法以搜索最优进化树（定义于 mcmc.h）。 
+	getGeneNames()：读取突变名列表文件，若无则使用默认 ID。 
+	setMoveProbs()：设置 MCMC 迭代中各项提议操作（Move）的发生概率。 
+	getOutputFilePrefix()：生成输出文件的前缀路径。 
+	getParentVectorFromGVfile()：从 GraphViz 文件中读取已知的父节点向量（用于模拟数据对比）。 
+	printGeneFrequencies()：统计并打印输入数据中各基因的突变频率。 getErrorRatesArray()：将输入的各项测序错误率（FD, AD1, AD2, CC）封装为数组。 
+
+4. 输入：
+	fileName：突变矩阵文件路径（-i 参数）。 
+	n：突变位点数量（-n 参数）。 
+	m：单细胞样本数量（-m 参数）。 
+	fd：假阳性率（-fd 参数）。 
+	ad1：等位基因掉库/假阴性率（-ad 参数）。
+	rep：MCMC 重复次数（-r 参数）。 
+	loops：单次 MCMC 的迭代步数（-l 参数）。 
+
+5. 输出：
+	.newick 文件：保存推断的最优树（Newick 格式）。 
+	.gv 文件：保存推断的最优树（GraphViz 格式）。 
+	.samples 文件：如果开启采样模式，保存后验分布的采样结果。 
+
+6. 注意事项：
+	算法假设：
+		默认遵循无限位点假设（ISA），除非使用 transposition 模式处理特定变体。 
+	使用时的重要限制或潜在问题：
+		输入矩阵必须严格符合格式要求（0, 1, 2, 3）；大规模数据集下 MCMC 收敛可能较慢。
+*/
 #include <stdbool.h>
 #include <vector>
 #include <stdlib.h>
