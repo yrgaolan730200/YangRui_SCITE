@@ -206,3 +206,6 @@ To make sure that **SCITE** samples from the posterior distribution `-p <INT>` n
 
 When combined with `-transpose` there are only two move types, *prune and re-attach* and *swap leaf labels* with default probabilities (0.4, 0.6).  Therefore the parameter format for changing these move probabilities is `-move_probs <double> <double>`.
 
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/yrgaolan730200/YangRui_SCITE)
+
