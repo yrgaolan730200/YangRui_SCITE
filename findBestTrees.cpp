@@ -11,7 +11,9 @@
 	SCITE 软件的主程序文件，用于通过 MCMC 算法推断单细胞测序数据中的肿瘤突变进化树。 
 
 2. 背景说明： 
-	该文件是 SCITE 项目的入口点，负责解析命令行参数、加载突变矩阵、配置错误率模型及启动 MCMC 搜索流程，最终输出最大似然或最大后验概率树。对应于 Kuipers J 等人 2017 年发表在 Genome Research 上的研究。 
+	该文件是 SCITE 项目的入口点，负责解析命令行参数、加载突变矩阵、
+	配置错误率模型及启动 MCMC 搜索流程，最终输出最大似然或最大后验
+	概率树。对应于 Kuipers J 等人 2017 年发表在 Genome Research 上的研究。 
 
 3. 主要内容：
 	main()：程序主入口，协调数据读取、MCMC 运行及结果输出。 
@@ -22,7 +24,8 @@
 	setMoveProbs()：设置 MCMC 迭代中各项提议操作（Move）的发生概率。 
 	getOutputFilePrefix()：生成输出文件的前缀路径。 
 	getParentVectorFromGVfile()：从 GraphViz 文件中读取已知的父节点向量（用于模拟数据对比）。 
-	printGeneFrequencies()：统计并打印输入数据中各基因的突变频率。 getErrorRatesArray()：将输入的各项测序错误率（FD, AD1, AD2, CC）封装为数组。 
+	printGeneFrequencies()：统计并打印输入数据中各基因的突变频率。 
+	getErrorRatesArray()：将输入的各项测序错误率（FD, AD1, AD2, CC）封装为数组。 
 
 4. 输入：
 	fileName：突变矩阵文件路径（-i 参数）。 
