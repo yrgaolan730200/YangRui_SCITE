@@ -1,5 +1,7 @@
 # SCITE
 ========
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/yrgaolan730200/YangRui_SCITE)
+
 
 ## Update
 ---------
@@ -205,7 +207,4 @@ To make sure that **SCITE** samples from the posterior distribution `-p <INT>` n
 *	`-move_probs <double> <double> <double>`   Changes the default probabilities for the three MCMC moves to the spedified values. The first move is *prune and re-attach*, the second is *swap node labels*, the third is *swap subtrees*. The default values are (0.55, 0.4, 0.05).
 
 When combined with `-transpose` there are only two move types, *prune and re-attach* and *swap leaf labels* with default probabilities (0.4, 0.6).  Therefore the parameter format for changing these move probabilities is `-move_probs <double> <double>`.
-
-
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/yrgaolan730200/YangRui_SCITE)
 
